@@ -1,7 +1,7 @@
 ### Hi, I'm Hiba!
 
 👩‍💻 Currently studying BASc Software Engineering at University of Ottawa <br/>
-☁️ Currently exporing UI & UX design
+☁️ Currently enhancing my UI & UX design skills
 
 <!-- GitHub stats from https://github.com/anuraghazra/github-readme-stats -->
 <!-- GitHub profile ReadMe template from https://gprm.itsvg.in/-->
