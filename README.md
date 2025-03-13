@@ -20,6 +20,7 @@ You can download or view my resume from the following link:
 [![](https://visitcount.itsvg.in/api?id=carrot03&icon=8&color=12)](https://visitcount.itsvg.in)
 
 <!-- Proudly created with GPRM ( https://gprm.itsvg.in ) -->
+# ✨Some of my designs:
 <!-- figma designs -->
 ## 🚀 Hackathon Platform Management - In Progress
 A streamlined platform designed to enhance hackathon organization and participation. 
