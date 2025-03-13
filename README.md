@@ -3,6 +3,10 @@
 👩‍💻 Currently studying BASc Software Engineering at University of Ottawa <br/>
 ☁️ Currently enhancing my UI & UX design skills
 
+## 📄 Resume  
+You can download or view my resume from the following link:  
+- [Download Resume](https://drive.google.com/file/d/16bVLeLqpWNrhrr43_b0TceSJAmNKiRuB/view?usp=drive_link)
+  
 <!-- GitHub stats from https://github.com/anuraghazra/github-readme-stats -->
 <!-- GitHub profile ReadMe template from https://gprm.itsvg.in/-->
 # 💻 Tech Stack:
@@ -17,8 +21,8 @@
 
 <!-- Proudly created with GPRM ( https://gprm.itsvg.in ) -->
 <!-- figma designs -->
-## 🚀 Hackathon Platform Management  
-A streamlined platform designed to enhance hackathon organization and participation.  
+## 🚀 Hackathon Platform Management - In Progress
+A streamlined platform designed to enhance hackathon organization and participation. 
 
 ![Hackathon Platform](https://github.com/user-attachments/assets/a51d4f29-c86e-45f3-82d7-d7d681c22f2c)  
 
@@ -29,11 +33,11 @@ A streamlined platform designed to enhance hackathon organization and participat
 
 ---
 
-## 🎨 Van Gogh-Inspired Website  
+## 🎨 Van Gogh-Inspired Website - In Progress
 A creative project inspired by Van Gogh’s artistic vision. The idea behind this design was to imagine:  
 _"What if Van Gogh made a website? How would it look?"_  
 
-This project is purely for artistic exploration and skill enhancement.  
+This project is purely for artistic exploration and skill enhancement. 
 
 ![Van Gogh Website](https://github.com/user-attachments/assets/7dc1dd0a-b205-4088-9456-e3cc3719d940)  
 
@@ -42,8 +46,8 @@ This project is purely for artistic exploration and skill enhancement.
 
 ---
 
-## 🌐 Personal Portfolio  
-A high-fidelity portfolio design showcasing my work, projects, and experience.  
+## 🌐 Personal Portfolio - Ready for Development
+A high-fidelity portfolio design showcasing my work, projects, and experience.   
 
 ![Portfolio](https://github.com/user-attachments/assets/cdc672e8-faa2-4fce-9c10-1dfdde002d7d)  
 
