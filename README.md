@@ -6,7 +6,11 @@
 ## 📄 Resume  
 You can download or view my resume from the following link:  
 - [Download Resume](https://drive.google.com/file/d/16bVLeLqpWNrhrr43_b0TceSJAmNKiRuB/view?usp=drive_link)
-  
+
+## Sneak peak on what I am up to 🤫
+Learning Front-End principles. check it out: https://github.com/carrot03/frontend-learnings  
+sources: [greatfrontend](https://www.greatfrontend.com/)
+
 <!-- GitHub stats from https://github.com/anuraghazra/github-readme-stats -->
 <!-- GitHub profile ReadMe template from https://gprm.itsvg.in/-->
 # 💻 Tech Stack:
