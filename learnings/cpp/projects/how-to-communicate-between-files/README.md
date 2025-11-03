@@ -8,3 +8,7 @@ once pragma - [learn microsoft](https://learn.microsoft.com/en-us/cpp/preprocess
 char[] vs string - [stackoverflow](https://stackoverflow.com/questions/1287306/difference-between-string-and-char-types-in-c)
 
 global variable - [stackoverflow](https://stackoverflow.com/questions/11072244/c-multiple-definitions-of-a-variable)
+
+## Created Tags
+1. [communicate-through-main](https://github.com/carrot03/carrot03/releases/tag/communicate-through-main)
+2. [communicate-without-main](https://github.com/carrot03/carrot03/releases/tag/communicate-without-main)
