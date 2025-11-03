@@ -4,6 +4,9 @@
 #include <chrono>
 #include <thread>
 
+void wakeUp() {
+    produce();
+}
 
 void produce() {
     std::string msg1 = "berries";

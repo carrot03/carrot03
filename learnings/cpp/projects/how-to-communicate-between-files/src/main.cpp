@@ -5,7 +5,7 @@
 
 int main() {
 
-    produce();
+    wakeUp();
     std::cout << "I am full now :)" << std::endl;
     return 0;
 }
