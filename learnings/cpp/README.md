@@ -1,5 +1,5 @@
 ## Learn CPP
-This repository is simply made to create simple projects in order to practice or test an idea of cpp code implementation.
+This repository is simply made to create simple projects in order to practice and/or test an idea of cpp code implementation.
 
 ## How To Communicate Between Two Files
 [how-to-communicate-between-files](projects/how-to-communicate-between-files/README.md)
