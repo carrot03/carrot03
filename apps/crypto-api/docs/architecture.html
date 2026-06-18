@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CryptoDash — Architecture</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d1117; color: #e6edf3; line-height: 1.6; padding: 32px 24px 64px; }
+  a { color: #58a6ff; text-decoration: none; }
+
+  .page { max-width: 960px; margin: 0 auto; }
+
+  /* Header */
+  .doc-header { margin-bottom: 40px; padding-bottom: 24px; border-bottom: 1px solid #21262d; }
+  .doc-header h1 { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.03em; }
+  .doc-header h1 span { color: #58a6ff; }
+  .doc-header .meta { margin-top: 8px; font-size: 0.82rem; color: #8b949e; display: flex; gap: 20px; flex-wrap: wrap; }
+  .doc-header .meta span { display: flex; align-items: center; gap: 5px; }
+  .badge { display: inline-block; background: #21262d; border: 1px solid #30363d; border-radius: 20px; padding: 2px 10px; font-size: 0.72rem; font-weight: 600; color: #8b949e; }
+  .badge.green { background: rgba(63,185,80,0.1); border-color: rgba(63,185,80,0.3); color: #3fb950; }
+  .badge.blue  { background: rgba(88,166,255,0.1); border-color: rgba(88,166,255,0.3); color: #58a6ff; }
+  .badge.orange{ background: rgba(210,153,34,0.1); border-color: rgba(210,153,34,0.3); color: #e3b341; }
+
+  /* Sections */
+  section { margin-bottom: 40px; }
+  h2 { font-size: 1.05rem; font-weight: 700; color: #e6edf3; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #21262d; display: flex; align-items: center; gap: 8px; }
+  h2 .icon { font-size: 1rem; }
+  h3 { font-size: 0.85rem; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; }
+
+  /* Diagram */
+  .diagram { background: #161b22; border: 1px solid #21262d; border-radius: 12px; padding: 28px 20px; overflow-x: auto; }
+  .flow { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: nowrap; min-width: 600px; }
+  .box { background: #0d1117; border: 1px solid #30363d; border-radius: 10px; padding: 12px 16px; text-align: center; min-width: 110px; }
+  .box .b-title { font-size: 0.78rem; font-weight: 700; margin-bottom: 4px; }
+  .box .b-sub { font-size: 0.68rem; color: #8b949e; line-height: 1.4; }
+  .box.blue  { border-color: rgba(88,166,255,0.4); }
+  .box.blue .b-title  { color: #58a6ff; }
+  .box.green { border-color: rgba(63,185,80,0.4); }
+  .box.green .b-title { color: #3fb950; }
+  .box.orange{ border-color: rgba(227,179,65,0.4); }
+  .box.orange .b-title{ color: #e3b341; }
+  .box.purple{ border-color: rgba(163,113,247,0.4); }
+  .box.purple .b-title{ color: #a371f7; }
+  .arrow { color: #30363d; font-size: 1.3rem; padding: 0 6px; flex-shrink: 0; }
+  .arrow-label { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 0 4px; }
+  .arrow-label span { font-size: 0.62rem; color: #8b949e; white-space: nowrap; }
+
+  /* File tree */
+  .filetree { background: #161b22; border: 1px solid #21262d; border-radius: 10px; padding: 16px 20px; font-family: 'Courier New', Courier, monospace; font-size: 0.82rem; line-height: 2; }
+  .filetree .dir { color: #58a6ff; font-weight: 700; }
+  .filetree .file { color: #e6edf3; }
+  .filetree .comment { color: #8b949e; margin-left: 12px; font-family: inherit; }
+  .filetree .indent1 { padding-left: 20px; }
+  .filetree .indent2 { padding-left: 40px; }
+
+  /* Endpoint table */
+  .ep-table { width: 100%; border-collapse: collapse; }
+  .ep-table th { font-size: 0.72rem; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.06em; padding: 8px 12px; border-bottom: 1px solid #21262d; text-align: left; }
+  .ep-table td { padding: 10px 12px; border-bottom: 1px solid #161b22; font-size: 0.83rem; vertical-align: top; }
+  .ep-table tr:last-child td { border-bottom: none; }
+  .ep-table tr:hover td { background: #161b22; }
+  .method { display: inline-block; background: rgba(63,185,80,0.12); color: #3fb950; border-radius: 4px; padding: 2px 7px; font-size: 0.7rem; font-weight: 700; font-family: monospace; }
+  .path { font-family: monospace; color: #58a6ff; font-size: 0.82rem; }
+  .ep-table td:nth-child(3) { color: #8b949e; font-size: 0.8rem; }
+  .ep-table td code { background: #21262d; border-radius: 4px; padding: 1px 5px; font-size: 0.75rem; color: #e6edf3; }
+
+  /* Tech stack grid */
+  .stack-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  .stack-card { background: #161b22; border: 1px solid #21262d; border-radius: 10px; padding: 14px 16px; }
+  .stack-card .sc-label { font-size: 0.68rem; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+  .stack-card .sc-name { font-size: 0.9rem; font-weight: 700; margin-bottom: 2px; }
+  .stack-card .sc-detail { font-size: 0.75rem; color: #8b949e; }
+
+  /* Feature list */
+  .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 600px) { .feature-grid { grid-template-columns: 1fr; } }
+  .feat { background: #161b22; border: 1px solid #21262d; border-radius: 10px; padding: 13px 15px; }
+  .feat .f-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 3px; }
+  .feat .f-desc { font-size: 0.78rem; color: #8b949e; line-height: 1.5; }
+
+  /* Coins grid */
+  .coins-grid { display: flex; flex-wrap: wrap; gap: 7px; }
+  .coin-chip { background: #161b22; border: 1px solid #21262d; border-radius: 6px; padding: 4px 10px; font-size: 0.75rem; color: #8b949e; }
+  .coin-chip strong { color: #e6edf3; }
+
+  /* Deployment */
+  .deploy-list { display: flex; flex-direction: column; gap: 8px; }
+  .deploy-item { background: #161b22; border: 1px solid #21262d; border-radius: 8px; padding: 12px 16px; display: flex; align-items: flex-start; gap: 12px; }
+  .deploy-item .di-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+  .deploy-item .di-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 2px; }
+  .deploy-item .di-detail { font-size: 0.78rem; color: #8b949e; }
+
+  /* Limitations */
+  .note { background: rgba(227,179,65,0.06); border: 1px solid rgba(227,179,65,0.25); border-radius: 8px; padding: 12px 16px; font-size: 0.8rem; color: #8b949e; line-height: 1.6; }
+  .note strong { color: #e3b341; }
+  ul.plain { padding-left: 18px; }
+  ul.plain li { margin-bottom: 4px; font-size: 0.82rem; color: #8b949e; }
+  ul.plain li strong { color: #e6edf3; }
+
+  /* Test plan */
+  .cov-table { width: 100%; border-collapse: collapse; }
+  .cov-table th { font-size: 0.72rem; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.06em; padding: 8px 12px; border-bottom: 1px solid #21262d; text-align: left; }
+  .cov-table td { padding: 10px 12px; border-bottom: 1px solid #161b22; font-size: 0.82rem; vertical-align: middle; }
+  .cov-table tr:last-child td { border-bottom: none; }
+  .cov-table tr:hover td { background: #161b22; }
+  .status { display: inline-flex; align-items: center; gap: 5px; font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 12px; white-space: nowrap; }
+  .status.pass  { background: rgba(63,185,80,0.12);  color: #3fb950; }
+  .status.none  { background: rgba(248,81,73,0.12);  color: #f85149; }
+  .status.part  { background: rgba(227,179,65,0.12); color: #e3b341; }
+  .pri { font-size: 0.72rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+  .pri.high { background: rgba(248,81,73,0.1); color: #f85149; }
+  .pri.med  { background: rgba(227,179,65,0.1); color: #e3b341; }
+  .pri.low  { background: rgba(88,166,255,0.1);  color: #58a6ff; }
+  .cov-table td:nth-child(2) { color: #8b949e; font-size: 0.78rem; }
+  .cov-table code { background: #21262d; border-radius: 4px; padding: 1px 5px; font-size: 0.74rem; color: #e6edf3; }
+  .progress-bar { height: 8px; background: #21262d; border-radius: 4px; overflow: hidden; margin-top: 4px; }
+  .progress-fill { height: 100%; border-radius: 4px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+  @media (max-width: 600px) { .summary-grid { grid-template-columns: 1fr 1fr; } }
+  .sum-card { background: #161b22; border: 1px solid #21262d; border-radius: 10px; padding: 14px; text-align: center; }
+  .sum-card .sum-num { font-size: 1.6rem; font-weight: 800; }
+  .sum-card .sum-lbl { font-size: 0.72rem; color: #8b949e; margin-top: 2px; }
+  .code-block { background: #161b22; border: 1px solid #21262d; border-radius: 10px; padding: 16px 18px; font-family: 'Courier New', monospace; font-size: 0.76rem; line-height: 1.8; overflow-x: auto; color: #e6edf3; }
+  .code-block .cm { color: #8b949e; }
+  .code-block .kw { color: #ff7b72; }
+  .code-block .fn { color: #d2a8ff; }
+  .code-block .st { color: #a5d6ff; }
+  .code-block .nr { color: #79c0ff; }
+  .plan-phases { display: flex; flex-direction: column; gap: 10px; }
+  .phase { background: #161b22; border: 1px solid #21262d; border-radius: 10px; padding: 14px 16px; }
+  .phase-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .phase-hdr .ph-icon { font-size: 1.1rem; }
+  .phase-hdr .ph-title { font-size: 0.88rem; font-weight: 700; }
+  .phase-hdr .ph-badge { margin-left: auto; }
+  .phase ul { padding-left: 18px; }
+  .phase ul li { font-size: 0.8rem; color: #8b949e; margin-bottom: 3px; line-height: 1.5; }
+  .phase ul li strong { color: #e6edf3; }
+  .phase ul li code { background: #21262d; border-radius: 3px; padding: 1px 4px; font-size: 0.72rem; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="doc-header">
+    <h1>Crypto<span>Dash</span> — Architecture</h1>
+    <div class="meta">
+      <span>🦀 Rust · Axum 0.7</span>
+      <span>☁️ Deployed on Fly.io</span>
+      <span>🌐 <a href="https://crypto-api-htantawi.fly.dev" target="_blank">crypto-api-htantawi.fly.dev</a></span>
+      <span><span class="badge green">Live</span></span>
+      <span><span class="badge blue">v0.1.0</span></span>
+    </div>
+  </div>
+
+  <!-- Request flow -->
+  <section>
+    <h2><span class="icon">🔄</span> Request Flow</h2>
+    <div class="diagram">
+      <div class="flow">
+        <div class="box blue">
+          <div class="b-title">Browser</div>
+          <div class="b-sub">HTML/CSS/JS<br>Chart.js</div>
+        </div>
+        <div class="arrow-label">
+          <span>HTTP/HTTPS</span>
+          <span style="font-size:1.2rem; color:#30363d">→</span>
+          <span>GET /api/*</span>
+        </div>
+        <div class="box green">
+          <div class="b-title">Axum Server</div>
+          <div class="b-sub">Rust · Port 3000<br>Fly.io machine</div>
+        </div>
+        <div class="arrow-label">
+          <span>HTTPS</span>
+          <span style="font-size:1.2rem; color:#30363d">→</span>
+          <span>/api/v3/*</span>
+        </div>
+        <div class="box orange">
+          <div class="b-title">CoinGecko</div>
+          <div class="b-sub">Free public API<br>No auth required</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- File structure -->
+  <section>
+    <h2><span class="icon">📁</span> Project Structure</h2>
+    <div class="filetree">
+      <div><span class="dir">crypto-api/</span></div>
+      <div class="indent1"><span class="file">Cargo.toml</span>       <span class="comment">— dependencies (axum, tokio, reqwest, serde_json)</span></div>
+      <div class="indent1"><span class="file">Cargo.lock</span>       <span class="comment">— pinned dependency versions</span></div>
+      <div class="indent1"><span class="file">Dockerfile</span>       <span class="comment">— multi-stage build (rust:1.86-slim → debian:bookworm-slim)</span></div>
+      <div class="indent1"><span class="file">.dockerignore</span>    <span class="comment">— excludes target/, .git/, *.log</span></div>
+      <div class="indent1"><span class="file">fly.toml</span>         <span class="comment">— Fly.io app config (region: iad, 256 MB RAM)</span></div>
+      <div class="indent1"><span class="dir">src/</span></div>
+      <div class="indent2"><span class="file">main.rs</span>          <span class="comment">— server entry point, route handlers, unit tests (144 lines)</span></div>
+      <div class="indent2"><span class="file">index.html</span>       <span class="comment">— embedded frontend, served at GET / (478 lines)</span></div>
+      <div class="indent1"><span class="dir">docs/</span></div>
+      <div class="indent2"><span class="file">architecture.html</span> <span class="comment">— this document</span></div>
+    </div>
+  </section>
+
+  <!-- API Endpoints -->
+  <section>
+    <h2><span class="icon">🛣️</span> API Endpoints</h2>
+    <div style="background:#161b22;border:1px solid #21262d;border-radius:10px;overflow:hidden;">
+      <table class="ep-table">
+        <thead>
+          <tr><th>Method</th><th>Path</th><th>Description</th><th>CoinGecko endpoint</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="method">GET</span></td>
+            <td><span class="path">/</span></td>
+            <td>Serves the embedded HTML dashboard (<code>include_str!</code> at compile time)</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td><span class="method">GET</span></td>
+            <td><span class="path">/api/coins</span></td>
+            <td>All 20 supported coins — price, 1h/24h/7d change, market cap, volume, sparkline, ATH, supply</td>
+            <td><code>/coins/markets?sparkline=true&amp;price_change_percentage=1h,7d</code></td>
+          </tr>
+          <tr>
+            <td><span class="method">GET</span></td>
+            <td><span class="path">/api/coin/:symbol</span></td>
+            <td>Single coin by ticker (e.g. <code>btc</code>, <code>eth</code>). Same fields as above.</td>
+            <td><code>/coins/markets?ids={id}&amp;sparkline=true</code></td>
+          </tr>
+          <tr>
+            <td><span class="method">GET</span></td>
+            <td><span class="path">/api/global</span></td>
+            <td>Global market stats — total market cap, 24h volume, BTC/ETH dominance, active coin count</td>
+            <td><code>/global</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Backend -->
+  <section>
+    <h2><span class="icon">🦀</span> Backend — <code>main.rs</code></h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div>
+        <h3>Key functions</h3>
+        <div class="deploy-list">
+          <div class="deploy-item"><div class="di-icon">🔍</div><div><div class="di-title"><code>symbol_to_coin()</code></div><div class="di-detail">Maps a ticker string to its CoinGecko ID, display name. Case-insensitive linear scan over the <code>COINS</code> const array.</div></div></div>
+          <div class="deploy-item"><div class="di-icon">🌐</div><div><div class="di-title"><code>fetch_json()</code></div><div class="di-detail">Generic async HTTP GET using <code>reqwest</code>. Returns <code>serde_json::Value</code> or a <code>(StatusCode, String)</code> error.</div></div></div>
+          <div class="deploy-item"><div class="di-icon">📊</div><div><div class="di-title"><code>api_coins()</code></div><div class="di-detail">Fetches all 20 coins in one CoinGecko call, passes the JSON array straight through to the client.</div></div></div>
+          <div class="deploy-item"><div class="di-icon">🪙</div><div><div class="di-title"><code>api_coin()</code></div><div class="di-detail">Resolves symbol → CoinGecko ID, fetches single-coin market data, returns first element of the array.</div></div></div>
+        </div>
+      </div>
+      <div>
+        <h3>Supported coins (20)</h3>
+        <div class="coins-grid" style="margin-bottom:12px;">
+          <span class="coin-chip"><strong>BTC</strong> Bitcoin</span>
+          <span class="coin-chip"><strong>ETH</strong> Ethereum</span>
+          <span class="coin-chip"><strong>BNB</strong> BNB</span>
+          <span class="coin-chip"><strong>SOL</strong> Solana</span>
+          <span class="coin-chip"><strong>XRP</strong> XRP</span>
+          <span class="coin-chip"><strong>DOGE</strong> Dogecoin</span>
+          <span class="coin-chip"><strong>ADA</strong> Cardano</span>
+          <span class="coin-chip"><strong>AVAX</strong> Avalanche</span>
+          <span class="coin-chip"><strong>TRX</strong> TRON</span>
+          <span class="coin-chip"><strong>LINK</strong> Chainlink</span>
+          <span class="coin-chip"><strong>DOT</strong> Polkadot</span>
+          <span class="coin-chip"><strong>LTC</strong> Litecoin</span>
+          <span class="coin-chip"><strong>SHIB</strong> Shiba Inu</span>
+          <span class="coin-chip"><strong>UNI</strong> Uniswap</span>
+          <span class="coin-chip"><strong>ATOM</strong> Cosmos</span>
+          <span class="coin-chip"><strong>XLM</strong> Stellar</span>
+          <span class="coin-chip"><strong>BCH</strong> Bitcoin Cash</span>
+          <span class="coin-chip"><strong>NEAR</strong> NEAR Protocol</span>
+          <span class="coin-chip"><strong>APT</strong> Aptos</span>
+          <span class="coin-chip"><strong>FIL</strong> Filecoin</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Frontend features -->
+  <section>
+    <h2><span class="icon">🖥️</span> Frontend — <code>index.html</code></h2>
+    <p style="font-size:0.82rem;color:#8b949e;margin-bottom:14px;">Single embedded file, compiled into the binary via <code>include_str!</code>. No build step, no bundler, no framework.</p>
+    <div class="feature-grid">
+      <div class="feat"><div class="f-title">📊 Global Stats Bar</div><div class="f-desc">Total market cap + 24h change, volume, BTC &amp; ETH dominance, active coin count. Sourced from <code>/api/global</code>.</div></div>
+      <div class="feat"><div class="f-title">📋 Sortable Table</div><div class="f-desc">Click any column header to sort ascending/descending. Columns: rank, name, price, 1h%, 24h%, 7d%, market cap, volume, sparkline.</div></div>
+      <div class="feat"><div class="f-title">📈 SVG Sparklines</div><div class="f-desc">7-day price chart per row rendered as an inline SVG polyline. Green or red based on the 7d change direction. No Chart.js overhead per row.</div></div>
+      <div class="feat"><div class="f-title">🔍 Search &amp; Filter</div><div class="f-desc">Real-time filter by coin name or ticker symbol. Works in combination with the Watchlist filter.</div></div>
+      <div class="feat"><div class="f-title">⭐ Watchlist</div><div class="f-desc">Star any coin row to add it to your watchlist. Toggle button shows only favourites. Persisted in <code>localStorage</code>.</div></div>
+      <div class="feat"><div class="f-title">🪟 Detail Modal</div><div class="f-desc">Click a row for price, 1h/24h/7d changes, market cap, volume, ATH, circulating supply, max supply, and a Chart.js 7-day line chart.</div></div>
+      <div class="feat"><div class="f-title">🌙 Dark / Light Theme</div><div class="f-desc">CSS custom properties drive the full colour scheme. Toggle in the header, persisted in <code>localStorage</code>.</div></div>
+      <div class="feat"><div class="f-title">🔄 Auto-Refresh</div><div class="f-desc">Data refreshes every 60 seconds. A countdown timer is shown in the header. Both <code>/api/coins</code> and <code>/api/global</code> are fetched in parallel.</div></div>
+    </div>
+  </section>
+
+  <!-- Deployment -->
+  <section>
+    <h2><span class="icon">☁️</span> Deployment</h2>
+    <div class="deploy-list">
+      <div class="deploy-item"><div class="di-icon">🐳</div><div><div class="di-title">Multi-stage Docker build</div><div class="di-detail"><strong>Stage 1</strong> <code>rust:1.86-slim</code> — compiles the release binary with dependency caching. <strong>Stage 2</strong> <code>debian:bookworm-slim</code> — copies only the binary + CA certs. Final image: ~27 MB.</div></div></div>
+      <div class="deploy-item"><div class="di-icon">✈️</div><div><div class="di-title">Fly.io — <code>crypto-api-htantawi.fly.dev</code></div><div class="di-detail">Region: <code>iad</code> (Washington DC). 2 machines for HA. 256 MB RAM, 1 shared vCPU. Auto-stops when idle; auto-starts on first request.</div></div></div>
+      <div class="deploy-item"><div class="di-icon">🔒</div><div><div class="di-title">HTTPS enforced</div><div class="di-detail">Fly.io terminates TLS. <code>force_https = true</code> in <code>fly.toml</code>. Server listens on <code>0.0.0.0:$PORT</code>.</div></div></div>
+    </div>
+  </section>
+
+  <!-- Tech stack -->
+  <section>
+    <h2><span class="icon">🔧</span> Tech Stack</h2>
+    <div class="stack-grid">
+      <div class="stack-card"><div class="sc-label">Language</div><div class="sc-name">Rust (edition 2024)</div><div class="sc-detail">Compiled, memory-safe, zero-cost abstractions</div></div>
+      <div class="stack-card"><div class="sc-label">Web Framework</div><div class="sc-name">Axum 0.7.9</div><div class="sc-detail">Built on Tower + Hyper. matchit 0.7.3 routing (<code>:param</code> syntax)</div></div>
+      <div class="stack-card"><div class="sc-label">Async Runtime</div><div class="sc-name">Tokio 1</div><div class="sc-detail">Multi-threaded async executor, full features</div></div>
+      <div class="stack-card"><div class="sc-label">HTTP Client</div><div class="sc-name">reqwest 0.12</div><div class="sc-detail">Async HTTP, native-tls, JSON deserialization</div></div>
+      <div class="stack-card"><div class="sc-label">Serialization</div><div class="sc-name">serde_json 1</div><div class="sc-detail">CoinGecko responses passed through as <code>Value</code></div></div>
+      <div class="stack-card"><div class="sc-label">Charts</div><div class="sc-name">Chart.js 4.4.2</div><div class="sc-detail">CDN-loaded. Used only for the modal detail chart</div></div>
+      <div class="stack-card"><div class="sc-label">Data Source</div><div class="sc-name">CoinGecko API v3</div><div class="sc-detail">Free tier, no API key. ~30 calls/min rate limit</div></div>
+      <div class="stack-card"><div class="sc-label">Hosting</div><div class="sc-name">Fly.io</div><div class="sc-detail">Docker-based, 2 HA machines, IAD region</div></div>
+    </div>
+  </section>
+
+  <!-- Test Plan & Coverage -->
+  <section>
+    <h2><span class="icon">🧪</span> Test Plan &amp; Coverage</h2>
+
+    <!-- Summary cards -->
+    <div class="summary-grid">
+      <div class="sum-card">
+        <div class="sum-num" style="color:#3fb950">5</div>
+        <div class="sum-lbl">Tests passing</div>
+        <div class="progress-bar" style="margin-top:8px"><div class="progress-fill" style="width:100%;background:#3fb950"></div></div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-num" style="color:#58a6ff">1</div>
+        <div class="sum-lbl">Layer covered</div>
+        <div class="progress-bar" style="margin-top:8px"><div class="progress-fill" style="width:25%;background:#58a6ff"></div></div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-num" style="color:#e3b341">4</div>
+        <div class="sum-lbl">Untested layers</div>
+        <div class="progress-bar" style="margin-top:8px"><div class="progress-fill" style="width:80%;background:#e3b341"></div></div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-num" style="color:#f85149">0</div>
+        <div class="sum-lbl">Handler tests</div>
+        <div class="progress-bar" style="margin-top:8px"><div class="progress-fill" style="width:0%;background:#f85149"></div></div>
+      </div>
+    </div>
+
+    <!-- Coverage matrix -->
+    <h3 style="margin-bottom:10px">Coverage Matrix</h3>
+    <div style="background:#161b22;border:1px solid #21262d;border-radius:10px;overflow:hidden;margin-bottom:20px;">
+      <table class="cov-table">
+        <thead>
+          <tr><th>Area</th><th>What it covers</th><th>Status</th><th>Priority</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong><code>symbol_to_coin()</code></strong></td>
+            <td>Known symbols, case-insensitivity, unknown inputs, all 20 COINS entries</td>
+            <td><span class="status pass">✓ Covered</span></td>
+            <td><span class="pri low">Low</span></td>
+          </tr>
+          <tr>
+            <td><strong><code>GET /</code></strong></td>
+            <td>Returns 200 with HTML; response includes dashboard content</td>
+            <td><span class="status none">✗ Missing</span></td>
+            <td><span class="pri med">Medium</span></td>
+          </tr>
+          <tr>
+            <td><strong><code>GET /api/coin/:symbol</code></strong></td>
+            <td>Valid symbol → 200 JSON; unknown symbol → 400; CoinGecko failure → 502</td>
+            <td><span class="status none">✗ Missing</span></td>
+            <td><span class="pri high">High</span></td>
+          </tr>
+          <tr>
+            <td><strong><code>GET /api/coins</code></strong></td>
+            <td>Returns JSON array; correct coin IDs sent to CoinGecko</td>
+            <td><span class="status none">✗ Missing</span></td>
+            <td><span class="pri high">High</span></td>
+          </tr>
+          <tr>
+            <td><strong><code>GET /api/global</code></strong></td>
+            <td>Proxies CoinGecko <code>/global</code>; handles upstream failure</td>
+            <td><span class="status none">✗ Missing</span></td>
+            <td><span class="pri med">Medium</span></td>
+          </tr>
+          <tr>
+            <td><strong>Route matching</strong></td>
+            <td><code>:symbol</code> param extracted correctly; unknown routes → 404</td>
+            <td><span class="status none">✗ Missing</span></td>
+            <td><span class="pri high">High</span></td>
+          </tr>
+          <tr>
+            <td><strong>JS formatters</strong></td>
+            <td><code>fmt.price()</code>, <code>fmt.big()</code>, <code>fmt.pct()</code> edge cases (null, zero, &gt;1T)</td>
+            <td><span class="status none">✗ Missing</span></td>
+            <td><span class="pri med">Medium</span></td>
+          </tr>
+          <tr>
+            <td><strong>SVG sparkline</strong></td>
+            <td>Empty array → fallback; correct colour for up/down; single point</td>
+            <td><span class="status none">✗ Missing</span></td>
+            <td><span class="pri low">Low</span></td>
+          </tr>
+          <tr>
+            <td><strong>CoinGecko integration</strong></td>
+            <td>Response shape matches what frontend expects; rate-limit 429 handling</td>
+            <td><span class="status none">✗ Missing</span></td>
+            <td><span class="pri high">High</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Test phases -->
+    <h3 style="margin-bottom:10px">Recommended Test Plan</h3>
+    <div class="plan-phases">
+
+      <div class="phase">
+        <div class="phase-hdr">
+          <span class="ph-icon">⚡</span>
+          <span class="ph-title">Phase 1 — Unit tests (Rust) · already in place</span>
+          <span class="ph-badge"><span class="status pass">✓ Done</span></span>
+        </div>
+        <ul>
+          <li><strong>Run:</strong> <code>cargo test</code></li>
+          <li><strong>File:</strong> <code>src/main.rs</code> — <code>#[cfg(test)] mod tests</code></li>
+          <li>Tests the only pure logic in the backend: <code>symbol_to_coin()</code>. No I/O, no async, no mocking needed.</li>
+        </ul>
+      </div>
+
+      <div class="phase">
+        <div class="phase-hdr">
+          <span class="ph-icon">🔗</span>
+          <span class="ph-title">Phase 2 — Handler tests (in-process, mocked HTTP)</span>
+          <span class="ph-badge"><span class="status none">✗ Not started</span></span>
+        </div>
+        <ul>
+          <li><strong>Add crate:</strong> <code>axum-test = "15"</code> (dev-dependency) + <code>wiremock = "0.6"</code></li>
+          <li><strong>Pattern:</strong> boot the Axum router in-process, spin up a <code>wiremock</code> server to fake CoinGecko, fire HTTP requests, assert on status codes and JSON fields.</li>
+          <li><strong>Cases to cover:</strong>
+            <code>GET /api/coin/btc</code> → 200 JSON with <code>symbol == "btc"</code>;
+            <code>GET /api/coin/zzz</code> → 400;
+            <code>GET /api/coins</code> → 200 array length == 20;
+            CoinGecko returns 429 → server returns 502.
+          </li>
+          <li><strong>No network calls:</strong> wiremock intercepts all outbound requests — tests run fully offline.</li>
+        </ul>
+      </div>
+
+      <div class="phase">
+        <div class="phase-hdr">
+          <span class="ph-icon">🌐</span>
+          <span class="ph-title">Phase 3 — Contract tests (live CoinGecko, skipped in CI)</span>
+          <span class="ph-badge"><span class="status none">✗ Not started</span></span>
+        </div>
+        <ul>
+          <li>Marked <code>#[ignore]</code> so they don't run on every <code>cargo test</code>. Run manually with <code>cargo test -- --ignored</code>.</li>
+          <li>Assert the actual CoinGecko response still contains the fields the app depends on (<code>current_price</code>, <code>sparkline_in_7d</code>, etc.). Catches upstream breaking changes early.</li>
+          <li>Rate-limit friendly: one call per test, no parallelism.</li>
+        </ul>
+      </div>
+
+      <div class="phase">
+        <div class="phase-hdr">
+          <span class="ph-icon">📐</span>
+          <span class="ph-title">Phase 4 — JS formatter unit tests</span>
+          <span class="ph-badge"><span class="status none">✗ Not started</span></span>
+        </div>
+        <ul>
+          <li>Extract <code>fmt.price()</code>, <code>fmt.big()</code>, <code>fmt.pct()</code>, and <code>sparkline()</code> into a separate <code>src/utils.js</code> file.</li>
+          <li>Test with <strong>Vitest</strong> or plain <code>node --test</code> (no framework needed for pure functions).</li>
+          <li>Key edge cases: <code>null</code> → <code>"—"</code>; <code>0</code>; values &gt; 1T; negative prices; empty sparkline array.</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Quickstart code snippet -->
+    <h3 style="margin-top:20px;margin-bottom:10px">Quickstart — adding a handler test</h3>
+    <div class="code-block"><span class="cm">// In Cargo.toml:</span>
+<span class="cm">// [dev-dependencies]</span>
+<span class="cm">// axum-test = "15"</span>
+<span class="cm">// wiremock = "0.6"</span>
+<span class="cm">// tokio = { version = "1", features = ["full"] }</span>
+
+<span class="kw">#[cfg(test)]</span>
+<span class="kw">mod</span> handler_tests {
+    <span class="kw">use</span> axum_test::TestServer;
+    <span class="kw">use</span> wiremock::{MockServer, Mock, ResponseTemplate};
+    <span class="kw">use</span> wiremock::matchers::path_regex;
+
+    <span class="kw">#[tokio::test]</span>
+    <span class="kw">async fn</span> <span class="fn">unknown_symbol_returns_400</span>() {
+        <span class="kw">let</span> server = TestServer::new(build_app()).unwrap();
+        <span class="kw">let</span> resp = server.get(<span class="st">"/api/coin/zzz"</span>).await;
+        resp.assert_status_bad_request();
+    }
+
+    <span class="kw">#[tokio::test]</span>
+    <span class="kw">async fn</span> <span class="fn">coin_endpoint_returns_json</span>() {
+        <span class="kw">let</span> mock_cg = MockServer::start().await;
+        Mock::given(path_regex(<span class="st">r"/api/v3/coins/markets"</span>))
+            .respond_with(ResponseTemplate::new(<span class="nr">200</span>)
+                .set_body_json(serde_json::json!([{<span class="st">"id"</span>: <span class="st">"bitcoin"</span>, <span class="st">"symbol"</span>: <span class="st">"btc"</span>}])))
+            .mount(&amp;mock_cg).await;
+        <span class="cm">// inject mock_cg.uri() into the app as the base URL</span>
+        <span class="kw">let</span> resp = TestServer::new(build_app_with_base(mock_cg.uri()))
+            .unwrap().get(<span class="st">"/api/coin/btc"</span>).await;
+        resp.assert_status_ok();
+        resp.assert_json_contains(&amp;serde_json::json!({"symbol": "btc"}));
+    }
+}</div>
+
+    <!-- How to run -->
+    <h3 style="margin-top:20px;margin-bottom:10px">Running Tests</h3>
+    <div style="background:#161b22;border:1px solid #21262d;border-radius:10px;overflow:hidden;">
+      <table class="cov-table">
+        <thead><tr><th>Command</th><th>What runs</th></tr></thead>
+        <tbody>
+          <tr><td><code>cargo test</code></td><td>All unit tests (5 currently). Fast, no network.</td></tr>
+          <tr><td><code>cargo test -- --nocapture</code></td><td>Same, with stdout printed.</td></tr>
+          <tr><td><code>cargo test -- --ignored</code></td><td>Live contract tests against CoinGecko (Phase 3). Requires network.</td></tr>
+          <tr><td><code>cargo test -- --test-threads=1</code></td><td>Forces serial execution — useful when handler tests share a port.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Known limitations -->
+  <section>
+    <h2><span class="icon">⚠️</span> Known Limitations</h2>
+    <div class="note">
+      <strong>No caching.</strong> Every frontend refresh triggers live CoinGecko API calls. Under heavy traffic this will hit the free tier rate limit (~30 req/min).
+      <ul class="plain" style="margin-top:8px;">
+        <li><strong>No server-side cache</strong> — a simple in-memory TTL cache (e.g. <code>Arc&lt;Mutex&lt;CachedData&gt;&gt;</code>) would fix this.</li>
+        <li><strong>Panics on server startup</strong> (<code>.unwrap()</code> in <code>main()</code>) — acceptable for a learning project; a production app would use structured error handling.</li>
+        <li><strong>No rate-limit handling</strong> — CoinGecko 429 responses are passed through as <code>502 Bad Gateway</code>.</li>
+        <li><strong>Coin list is hardcoded</strong> — adding a coin requires a code change and redeploy.</li>
+        <li><strong>No tests for HTTP handlers</strong> — only pure logic (<code>symbol_to_coin</code>) is unit-tested. Handler tests would require <code>axum-test</code> or <code>tower::ServiceExt</code>.</li>
+      </ul>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
