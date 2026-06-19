@@ -28,8 +28,3 @@ jobs:
       run: |
         gcloud auth list
         gcloud config get-value project
-
-    # Test upload to Cload Storage
-    - name: Upload to Cloud Storage
-      run: |
-        echo "Hello from GitHub Actions" > test.txt
