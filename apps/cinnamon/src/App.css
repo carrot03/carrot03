@@ -1,0 +1,874 @@
+/* ── Base ─────────────────────────────────────────── */
+.app {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  overflow: hidden;
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+* { cursor: none; box-sizing: border-box; }
+
+/* ── Phase shared ─────────────────────────────────── */
+.phase {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  animation: phase-in 0.5s ease-out both;
+}
+
+/* Scrollable phases — override the overflow: hidden from .phase */
+.frosting-phase,
+.done-phase {
+  overflow-y: auto;
+  overflow-x: hidden;
+  justify-content: flex-start;
+  padding-top: 52px;
+  padding-bottom: 72px;
+}
+
+@keyframes phase-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Phase label ─────────────────────────────────── */
+.phase-label {
+  position: fixed;
+  top: 18px;
+  right: 24px;
+  z-index: 100;
+  font-family: Georgia, serif;
+  font-size: 0.75rem;
+  font-style: italic;
+  color: rgba(90,40,0,0.55);
+  letter-spacing: 0.08em;
+  pointer-events: none;
+}
+
+.phase-oven .phase-label,
+.phase-frosting .phase-label {
+  color: rgba(255,180,80,0.6);
+}
+
+/* ── Background layers ────────────────────────────── */
+.ingredients-phase {
+  background: radial-gradient(ellipse 80% 70% at 50% 55%, #fde8c8 0%, #f9c98a 40%, #e8964a 100%);
+}
+
+.rolling-phase {
+  background: radial-gradient(ellipse 90% 80% at 50% 50%, #fff3e0 0%, #ffe0b0 40%, #f5c060 100%);
+}
+
+.cut-phase {
+  background: radial-gradient(ellipse 90% 80% at 50% 50%, #fef6e4 0%, #fde8c0 40%, #f0c060 100%);
+}
+
+.oven-phase {
+  background: radial-gradient(ellipse 80% 80% at 50% 50%, #1a0800 0%, #2e1000 40%, #1a0800 100%);
+}
+
+.filling-phase {
+  background: radial-gradient(ellipse 90% 80% at 50% 50%, #fef9ee 0%, #fde8c0 40%, #f0c060 100%);
+}
+
+.frosting-phase {
+  background: radial-gradient(ellipse 80% 70% at 50% 55%, #fff8ee 0%, #fde8b8 35%, #f8c860 70%, #e8a03a 100%);
+}
+
+.done-phase {
+  background: radial-gradient(ellipse 80% 70% at 50% 55%, #fff8e8 0%, #fde4a0 35%, #f8c060 70%, #e8903a 100%);
+}
+
+.bg-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 50% 45% at 50% 52%, rgba(255,230,170,0.65) 0%, transparent 70%),
+    radial-gradient(ellipse 80% 60% at 30% 70%, rgba(200,100,30,0.12) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.rolling-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 50% at 50% 60%, rgba(255,240,200,0.7) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cut-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 50% at 50% 55%, rgba(255,245,220,0.7) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.oven-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 50% 40% at 50% 50%, rgba(80,30,0,0.5) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.done-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 55% at 50% 52%, rgba(255,240,180,0.7) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ── Typography ──────────────────────────────────── */
+.title {
+  position: relative;
+  z-index: 10;
+  font-size: clamp(1.8rem, 4.5vw, 3.2rem);
+  font-weight: 700;
+  color: #5a2800;
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 12px rgba(200,100,20,0.2);
+  white-space: nowrap;
+  margin: 0 0 6px;
+}
+
+.oven-phase .title {
+  color: #FFB060;
+  text-shadow: 0 0 24px rgba(255,120,20,0.5);
+}
+
+.done-title {
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+}
+
+.subtitle {
+  position: relative;
+  z-index: 10;
+  font-style: italic;
+  font-size: clamp(0.8rem, 1.6vw, 1rem);
+  color: #8a4a18;
+  letter-spacing: 0.1em;
+  opacity: 0.8;
+  margin: 0 0 24px;
+}
+
+.oven-phase .subtitle {
+  color: #D08040;
+}
+
+/* ── Step indicator ──────────────────────────────── */
+.step-indicator {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 100;
+}
+
+.step-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(200,130,50,0.3);
+  border: 2px solid rgba(200,130,50,0.4);
+  transition: all 0.3s;
+}
+
+.step-dot.active {
+  background: #C87830;
+  border-color: #C87830;
+  transform: scale(1.3);
+}
+
+.step-dot.done {
+  background: #C87830;
+  border-color: #C87830;
+  opacity: 0.5;
+}
+
+/* ── Ingredient floaters ─────────────────────────── */
+.ingredient {
+  position: absolute;
+  z-index: 4;
+  background: none;
+  border: none;
+  padding: 6px;
+  border-radius: 12px;
+  will-change: transform;
+  filter: drop-shadow(0 6px 16px rgba(100,40,0,0.22));
+  transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1),
+              filter 0.2s;
+}
+
+.ingredient.clickable {
+  pointer-events: auto;
+}
+
+.ingredient.clickable:hover {
+  filter: drop-shadow(0 8px 20px rgba(200,100,20,0.45)) brightness(1.08);
+  z-index: 6;
+}
+
+.ingredient.flying {
+  transition: transform 0.42s cubic-bezier(0.6, 0, 1, 1), opacity 0.42s;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ingredient-label {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-family: Georgia, serif;
+  color: #7a3a08;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  background: rgba(255,240,210,0.85);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.ingredient.clickable:hover .ingredient-label {
+  opacity: 1;
+}
+
+/* ── Dough center ────────────────────────────────── */
+.dough-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 5;
+  will-change: transform;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.roll-glow {
+  position: absolute;
+  inset: -30px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,210,120,0.55) 0%, transparent 70%);
+  filter: blur(18px);
+  animation: pulse-glow 3s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes pulse-glow {
+  from { opacity: 0.6; transform: scale(0.95); }
+  to   { opacity: 1.0; transform: scale(1.08); }
+}
+
+.collected-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  max-width: 220px;
+  margin-top: 12px;
+  z-index: 6;
+}
+
+.collected-badge {
+  background: rgba(255,240,210,0.8);
+  border-radius: 8px;
+  padding: 3px;
+  border: 1.5px solid rgba(200,140,50,0.3);
+  animation: pop-in 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+  display: flex;
+  align-items: center;
+}
+
+@keyframes pop-in {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* ── Phase button ────────────────────────────────── */
+.phase-btn {
+  position: relative;
+  z-index: 20;
+  margin-top: 28px;
+  padding: 14px 32px;
+  font-family: Georgia, serif;
+  font-size: 1.05rem;
+  font-style: italic;
+  color: white;
+  background: linear-gradient(135deg, #D06020 0%, #A03010 100%);
+  border: none;
+  border-radius: 30px;
+  box-shadow: 0 4px 20px rgba(160,60,10,0.4), 0 1px 0 rgba(255,180,100,0.3) inset;
+  animation: btn-appear 0.4s 0.2s cubic-bezier(0.34,1.56,0.64,1) both;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.phase-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 28px rgba(160,60,10,0.5), 0 1px 0 rgba(255,180,100,0.3) inset;
+}
+
+.phase-btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+@keyframes btn-appear {
+  from { opacity: 0; transform: translateY(16px) scale(0.9); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.golden-btn {
+  background: linear-gradient(135deg, #E8A820 0%, #C07010 100%);
+  box-shadow: 0 4px 24px rgba(200,140,10,0.5), 0 1px 0 rgba(255,220,100,0.4) inset;
+  font-size: 1.15rem;
+}
+
+.restart-btn {
+  background: linear-gradient(135deg, #C87830 0%, #904010 100%);
+}
+
+/* ── Hint text ───────────────────────────────────── */
+.hint {
+  position: relative;
+  z-index: 10;
+  margin-top: 20px;
+  font-size: 0.88rem;
+  color: #9a5a20;
+  font-style: italic;
+  opacity: 0.75;
+}
+
+/* ── Rolling phase ───────────────────────────────── */
+.rolling-scene {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin: 20px 0;
+  z-index: 5;
+}
+
+.dough-slab {
+  position: relative;
+  z-index: 2;
+  animation: dough-flatten 2.6s ease-out forwards;
+}
+
+@keyframes dough-flatten {
+  0%   { transform: scaleX(0.5) scaleY(1.4); }
+  100% { transform: scaleX(1.1) scaleY(0.8); }
+}
+
+.rolling-pin-anim {
+  position: absolute;
+  top: -22px;
+  animation: roll-across 2.6s ease-in-out forwards;
+  z-index: 3;
+  transform-origin: center;
+}
+
+@keyframes roll-across {
+  0%   { transform: translateX(-280px) rotate(0deg); }
+  100% { transform: translateX(280px) rotate(360deg); }
+}
+
+.progress-bar-wrap {
+  width: 280px;
+  height: 8px;
+  background: rgba(200,130,50,0.2);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 32px;
+  z-index: 5;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #D06020, #F0A030);
+  border-radius: 8px;
+  animation: progress-fill 2.6s linear forwards;
+}
+
+@keyframes progress-fill {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+
+/* ── Cut phase ───────────────────────────────────── */
+.log-wrapper {
+  position: relative;
+  z-index: 5;
+  margin: 12px 0;
+  cursor: none;
+}
+
+.knife-guide {
+  position: absolute;
+  top: -10px;
+  bottom: -10px;
+  width: 2px;
+  background: rgba(180,100,20,0.35);
+  border-left: 2px dashed rgba(180,100,20,0.4);
+  pointer-events: none;
+  transform: translateX(-1px);
+}
+
+.knife-cursor {
+  position: fixed;
+  top: 0;
+  transform: translateX(-50%) translateY(-70px);
+  z-index: 99;
+  pointer-events: none;
+  transition: transform 0.08s linear;
+}
+
+.knife-cursor.chopping {
+  transform: translateX(-50%) translateY(-20px);
+}
+
+.cut-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 10px;
+  z-index: 5;
+}
+
+.roll-count {
+  font-size: 1.1rem;
+  color: #5a2800;
+  font-weight: bold;
+}
+
+.cut-hint {
+  font-size: 0.85rem;
+  color: #9a5a20;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+/* ── Oven phase ──────────────────────────────────── */
+.oven-scene {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 5;
+  margin: 8px 0;
+}
+
+.tray {
+  margin-top: 12px;
+  transition: transform 0.85s cubic-bezier(0.4,0,0.2,1), opacity 0.85s;
+  z-index: 6;
+}
+
+.tray-slide {
+  transform: translateY(-120px) translateX(40px) scale(0.6);
+  opacity: 0;
+}
+
+.tray-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.bake-progress {
+  position: relative;
+  width: 280px;
+  height: 10px;
+  background: rgba(255,100,20,0.2);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 16px;
+  z-index: 5;
+}
+
+.bake-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FF4010, #FF9020, #FFD060);
+  border-radius: 10px;
+  transition: width 0.15s linear;
+}
+
+.bake-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  color: white;
+  font-family: monospace;
+  mix-blend-mode: difference;
+}
+
+.steam {
+  animation: steam-rise 1.8s ease-in-out infinite;
+}
+
+@keyframes steam-rise {
+  0%   { opacity: 0; transform: translateY(0) scaleX(1); }
+  40%  { opacity: 0.6; }
+  100% { opacity: 0; transform: translateY(-30px) scaleX(1.4); }
+}
+
+/* ── Done phase ──────────────────────────────────── */
+.rolls-grid {
+  position: relative;
+  z-index: 5;
+  display: grid;
+  gap: 16px;
+  margin: 4px 0 20px;
+  transition: transform 0.1s linear;
+}
+
+.done-roll {
+  position: relative;
+  animation: roll-pop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@keyframes roll-pop {
+  from { transform: scale(0) rotate(-15deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0deg);   opacity: 1; }
+}
+
+.frosting-drip {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 30px;
+  background: rgba(255,248,239,0.9);
+  border-radius: 0 0 30px 30px;
+  animation: drip-in 0.4s 0.9s ease-out both;
+  z-index: 2;
+  pointer-events: none;
+}
+
+@keyframes drip-in {
+  from { height: 0; opacity: 0; }
+  to   { height: 30px; opacity: 1; }
+}
+
+.sparkle {
+  position: fixed;
+  z-index: 8;
+  animation: sparkle-pop 1.4s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes sparkle-pop {
+  0%   { transform: scale(0.6) rotate(0deg);   opacity: 0.5; }
+  50%  { transform: scale(1.2) rotate(20deg);  opacity: 1; }
+  100% { transform: scale(0.8) rotate(-10deg); opacity: 0.6; }
+}
+
+/* ── Custom cursor ───────────────────────────────── */
+.phase-cutting * { cursor: none; }
+
+/* Thin warm scrollbar for scrollable phases */
+.frosting-phase::-webkit-scrollbar,
+.done-phase::-webkit-scrollbar { width: 5px; }
+.frosting-phase::-webkit-scrollbar-track,
+.done-phase::-webkit-scrollbar-track { background: transparent; }
+.frosting-phase::-webkit-scrollbar-thumb,
+.done-phase::-webkit-scrollbar-thumb { background: rgba(200,130,50,0.35); border-radius: 8px; }
+
+/* ── Required ingredient ring ────────────────────── */
+.ingredient.required-item::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 2px solid rgba(220,100,20,0.55);
+  animation: req-pulse 1.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes req-pulse {
+  0%, 100% { transform: scale(1);    opacity: 0.55; }
+  50%       { transform: scale(1.12); opacity: 0.9; }
+}
+
+/* ── Required checklist ──────────────────────────── */
+.req-checklist {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 14px;
+  max-width: 480px;
+  margin-top: 14px;
+  z-index: 10;
+  position: relative;
+}
+
+.req-check {
+  font-size: 0.75rem;
+  font-family: Georgia, serif;
+  color: #9a5a20;
+  opacity: 0.7;
+  transition: all 0.3s;
+}
+
+.req-check.got {
+  color: #4A8C3A;
+  opacity: 1;
+  font-weight: bold;
+}
+
+.req-badge {
+  border-color: rgba(220,100,20,0.5) !important;
+}
+
+/* ── Filling phase ───────────────────────────────── */
+.filling-phase {
+  justify-content: center;
+  gap: 0;
+}
+
+.filling-cards {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  z-index: 10;
+  margin-bottom: 18px;
+}
+
+.filling-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 14px;
+  background: rgba(255,245,220,0.88);
+  border: 2px solid rgba(200,140,50,0.3);
+  border-radius: 14px;
+  font-family: Georgia, serif;
+  font-size: 0.78rem;
+  color: #7a3a08;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s, border-color 0.2s;
+  box-shadow: 0 3px 12px rgba(160,80,10,0.18);
+  position: relative;
+}
+
+.filling-card:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 22px rgba(160,80,10,0.3);
+  border-color: rgba(200,120,20,0.6);
+}
+
+.filling-card.req-card {
+  border-color: rgba(220,100,20,0.45);
+}
+
+.filling-card.applied {
+  opacity: 0.55;
+  border-color: #4A8C3A;
+  background: rgba(220,240,200,0.7);
+}
+
+.filling-card.spreading {
+  animation: spread-pulse 0.4s ease-out;
+}
+
+@keyframes spread-pulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.card-label {
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.card-check {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #4A8C3A;
+  color: white;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+}
+
+.flat-dough-wrap {
+  position: relative;
+  z-index: 5;
+  filter: drop-shadow(0 8px 20px rgba(160,80,10,0.25));
+}
+
+.spread-flash {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,220,100,0.35);
+  border-radius: 18px;
+  animation: flash-fade 0.4s ease-out both;
+  pointer-events: none;
+}
+
+@keyframes flash-fade {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes fade-in-fill {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Roll-up scene ───────────────────────────────── */
+.rollup-scene {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: -20px;
+  z-index: 5;
+  margin: 16px 0;
+}
+
+.rollup-dough {
+  animation: rollup-shrink 2.5s ease-in-out forwards;
+  transform-origin: right center;
+}
+
+@keyframes rollup-shrink {
+  0%   { transform: scaleX(1);    opacity: 1; }
+  80%  { transform: scaleX(0.15); opacity: 0.5; }
+  100% { transform: scaleX(0);    opacity: 0; }
+}
+
+.rollup-log {
+  position: absolute;
+  right: 0;
+  animation: rollup-grow 2.5s ease-in-out forwards;
+  transform-origin: right center;
+}
+
+@keyframes rollup-grow {
+  0%   { transform: scaleX(0);    opacity: 0; }
+  30%  { transform: scaleX(0.3);  opacity: 0.7; }
+  100% { transform: scaleX(1);    opacity: 1; }
+}
+
+/* ── Frosting phase ──────────────────────────────── */
+.frosting-mixing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  z-index: 5;
+}
+
+.frosting-bowl {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.bowl-label {
+  font-size: 0.78rem;
+  font-style: italic;
+  color: #9a5a20;
+  opacity: 0.7;
+  margin: 0;
+}
+
+.frosting-rolls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  z-index: 5;
+}
+
+.frosting-pour-anim {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  animation: pour-drop 0.5s ease-out both;
+  pointer-events: none;
+}
+
+@keyframes pour-drop {
+  from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes drip-path {
+  from { stroke-dasharray: 100; stroke-dashoffset: 100; }
+  to   { stroke-dasharray: 100; stroke-dashoffset: 0; }
+}
+
+.frosting-coat {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  pointer-events: none;
+  animation: coat-fade-in 0.4s ease-out both;
+}
+
+@keyframes coat-fade-in {
+  from { opacity: 0; transform: translateX(-50%) scaleX(0.6); }
+  to   { opacity: 1; transform: translateX(-50%) scaleX(1); }
+}
+
+/* ── Done phase frosting overlay ─────────────────── */
+.done-frosting {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  pointer-events: none;
+  animation: coat-fade-in 0.5s ease-out both;
+}
+
+/* Scale rolls down in frosting + done so they fit on screen */
+.frosting-phase .done-roll svg,
+.done-phase .done-roll svg {
+  width: 160px;
+  height: 160px;
+}
+
+.frosting-phase .rolls-grid,
+.done-phase .rolls-grid {
+  gap: 10px;
+}
+
+.frosting-phase .done-frosting svg,
+.done-phase .done-frosting svg {
+  width: 70px;
+  height: 24px;
+}
+
+.frosting-phase .frosting-coat svg {
+  width: 70px;
+  height: 22px;
+}
+
