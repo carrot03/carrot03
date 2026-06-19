@@ -1,0 +1,30 @@
+name: GCP Authentication Test
+
+on:
+  push:
+    branches: [ main ]
+
+# Crucial: GitHub needs permission to mint the OIDC token
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  test-gcp-auth:
+    runs-rate: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # Step 1: Authenticate using Workload Identity Federation
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        workload_identity_provider: 'projects/45020421770/locations/global/workloadIdentityPools/github'
+        service_account: '45020421770-compute@developer.gserviceaccount.com'
+
+    # Step 2: Test that you can interact with GCP
+    - name: Verify Authentication
+      run: |
+        gcloud auth list
+        gcloud config get-value project
