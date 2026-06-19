@@ -20,7 +20,7 @@ jobs:
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v2
       with:
-          workload_identity_provider: 'https://iam.googleapis.com/projects/45020421770/locations/global/workloadIdentityPools/github/providers/github'
+          workload_identity_provider: '/projects/45020421770/locations/global/workloadIdentityPools/github/providers/github'
           service_account: '45020421770-compute@developer.gserviceaccount.com'
 
     # Step 2: Test that you can interact with GCP
